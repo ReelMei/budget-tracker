@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Dashboard Header -->
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Track your campus budget in one place</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="cards-grid">
+    <div class="card card-balance">
+        <div class="card-label">Total Balance</div>
+        <div class="card-value">₦{{ "%.2f"|format(balance) }}</div>
+    </div>
+    <div class="card card-income">
+        <div class="card-label">Total Income</div>
+        <div class="card-value">₦{{ "%.2f"|format(total_income) }}</div>
+    </div>
+    <div class="card card-expense">
+        <div class="card-label">Total Expenses</div>
+        <div class="card-value">₦{{ "%.2f"|format(total_expense) }}</div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="section">
+    <div class="section-header">
+        <h2>Recent Transactions</h2>
+        <a href="{{ url_for('add_transaction') }}" class="btn btn-primary">+ Add New</a>
+    </div>
+
+    {% if transactions %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in transactions %}
+            <tr>
+                <td>{{ t.title }}</td>
+                <td><span class="badge">{{ t.category }}</span></td>
+                <td>
+                    <span class="badge {{ 'badge-income' if t.type == 'income' else 'badge-expense' }}">
+                        {{ t.type }}
+                    </span>
+                </td>
+                <td class="{{ 'amount-income' if t.type == 'income' else 'amount-expense' }}">
+                    {{ '+' if t.type == 'income' else '-' }}₦{{ "%.2f"|format(t.amount) }}
+                </td>
+                <td>{{ t.date.strftime('%b %d, %Y') }}</td>
+                <td>
+                    <a href="{{ url_for('delete_transaction', id=t.id) }}" 
+                       class="btn btn-danger"
+                       onclick="return confirm('Delete this transaction?')">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+    <div class="empty-state">
+        <p>No transactions yet.</p>
+        <a href="{{ url_for('add_transaction') }}" class="btn btn-primary">Add your first transaction</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
